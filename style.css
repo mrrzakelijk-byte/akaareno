@@ -1343,7 +1343,6 @@ textarea {
   color: #ffffff !important;
 }
 
-
 /* Footer brand visibility fix */
 .footer .footer-logo,
 footer .footer-logo {
@@ -1355,7 +1354,6 @@ footer .footer-logo {
 footer .footer-logo:hover {
   color: #ffffff !important;
 }
-
 
 /* Work locations section on services page */
 .work-locations-section {
@@ -1425,7 +1423,6 @@ footer .footer-logo {
   color: #ffffff !important;
   opacity: 1 !important;
 }
-
 
 /* Last requested refinements */
 .section-heading .eyebrow[data-i18n="about.special.eyebrow"] {
@@ -1511,7 +1508,10 @@ html[dir="rtl"] input[type="tel"] {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 220ms ease, transform 220ms ease, visibility 220ms ease;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    visibility 220ms ease;
 }
 
 .language-menu.open {
@@ -1536,7 +1536,10 @@ html[dir="rtl"] input[type="tel"] {
   font-weight: 800;
   text-align: left;
   cursor: pointer;
-  transition: background 200ms ease, color 200ms ease, transform 200ms ease;
+  transition:
+    background 200ms ease,
+    color 200ms ease,
+    transform 200ms ease;
 }
 
 .language-option:hover,
@@ -1617,7 +1620,6 @@ footer .footer-contact-details span {
   gap: 4px;
 }
 
-
 /* Final cleanup: remove separator lines in the trust strip and keep the updated logo clean */
 .trust-grid {
   gap: 0 !important;
@@ -1637,7 +1639,6 @@ footer .footer-contact-details span {
   padding: 4px !important;
   background: #ffffff !important;
 }
-
 
 /* Final cleanup: remove the light-blue vertical lines from contact information boxes only */
 .contact-sidebar .contact-box {
