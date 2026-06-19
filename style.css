@@ -818,11 +818,8 @@ textarea {
 }
 
 .contact-box::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--sky);
+  display: none !important;
+  content: none !important;
 }
 
 .contact-box:hover {
@@ -1639,4 +1636,18 @@ footer .footer-contact-details span {
   object-fit: contain !important;
   padding: 4px !important;
   background: #ffffff !important;
+}
+
+
+/* Final cleanup: remove the light-blue vertical lines from contact information boxes only */
+.contact-sidebar .contact-box {
+  border-left: 0 !important;
+}
+
+.contact-sidebar .contact-box::before,
+.contact-sidebar .contact-box::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  background: transparent !important;
 }
