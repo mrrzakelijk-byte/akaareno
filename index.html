@@ -1,655 +1,432 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="nl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Akaareno - Tijdelijk Offline</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
-      background:
-        linear-gradient(rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.92)),
-        radial-gradient(circle at top, #f59e0b, #111827 45%, #020617);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .page {
-      width: min(1000px, 95vw);
-      text-align: center;
-      padding: 22px;
-    }
-
-    .logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 18px;
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.72);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.28);
-      margin-bottom: 18px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-    }
-
-    .logo span {
-      color: #fbbf24;
-    }
-
-    h1 {
-      font-size: clamp(34px, 6vw, 72px);
-      line-height: 0.95;
-      margin-bottom: 14px;
-      letter-spacing: -2px;
-    }
-
-    .subtitle {
-      max-width: 720px;
-      margin: 0 auto 22px;
-      font-size: clamp(16px, 2.4vw, 22px);
-      color: #e5e7eb;
-      line-height: 1.5;
-    }
-
-    .subtitle strong {
-      color: #fbbf24;
-    }
-
-    .game {
-      position: relative;
-      width: min(860px, 94vw);
-      height: min(540px, 62vh);
-      min-height: 380px;
-      margin: 0 auto;
-      overflow: hidden;
-      border-radius: 28px;
-      background:
-        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(#1e293b, #020617);
-      background-size: 38px 38px;
-      border: 2px solid rgba(251, 191, 36, 0.35);
-      box-shadow: 0 26px 80px rgba(0,0,0,0.55);
-      touch-action: none;
-    }
-
-    .sun {
-      position: absolute;
-      top: 50px;
-      right: 70px;
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: #fbbf24;
-      box-shadow: 0 0 55px #f59e0b;
-      opacity: 0.9;
-    }
-
-    .crane {
-      position: absolute;
-      left: 35px;
-      top: 45px;
-      width: 210px;
-      height: 120px;
-      opacity: 0.7;
-    }
-
-    .crane::before {
-      content: "";
-      position: absolute;
-      left: 20px;
-      bottom: 0;
-      width: 18px;
-      height: 120px;
-      background: #f59e0b;
-      border-radius: 8px;
-    }
-
-    .crane::after {
-      content: "";
-      position: absolute;
-      left: 20px;
-      top: 0;
-      width: 185px;
-      height: 15px;
-      background: #f59e0b;
-      border-radius: 8px;
-    }
-
-    .hook {
-      position: absolute;
-      left: 175px;
-      top: 12px;
-      width: 3px;
-      height: 70px;
-      background: #fcd34d;
-    }
-
-    .hook::after {
-      content: "🪝";
-      position: absolute;
-      left: -12px;
-      bottom: -20px;
-      font-size: 25px;
-    }
-
-    .hud {
-      position: absolute;
-      z-index: 10;
-      top: 14px;
-      left: 16px;
-      right: 16px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      font-weight: 900;
-      font-size: 15px;
-      text-shadow: 0 3px 10px rgba(0,0,0,0.7);
-    }
-
-    .hud div {
-      padding: 9px 13px;
-      border-radius: 999px;
-      background: rgba(2, 6, 23, 0.55);
-      border: 1px solid rgba(255,255,255,0.14);
-    }
-
-    .ground {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 90px;
-      background:
-        repeating-linear-gradient(
-          90deg,
-          #78350f 0 42px,
-          #92400e 42px 84px
-        );
-      border-top: 5px solid #f59e0b;
-    }
-
-    .wall {
-      position: absolute;
-      left: 50%;
-      bottom: 90px;
-      transform: translateX(-50%);
-      width: 330px;
-      height: 0;
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      align-content: end;
-      gap: 4px;
-      transition: height 0.18s ease;
-      overflow: hidden;
-    }
-
-    .brick {
-      height: 22px;
-      border-radius: 5px;
-      background: linear-gradient(#f97316, #b45309);
-      border: 1px solid rgba(255,255,255,0.18);
-      box-shadow: inset 0 -4px rgba(0,0,0,0.18);
-    }
-
-    .player {
-      position: absolute;
-      z-index: 8;
-      bottom: 96px;
-      left: 50%;
-      width: 120px;
-      height: 46px;
-      transform: translateX(-50%);
-      border-radius: 18px 18px 12px 12px;
-      background: linear-gradient(#fbbf24, #f59e0b);
-      border: 3px solid #78350f;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.4);
-    }
-
-    .player::before {
-      content: "👷";
-      position: absolute;
-      left: 50%;
-      top: -42px;
-      transform: translateX(-50%);
-      font-size: 42px;
-      filter: drop-shadow(0 6px 5px rgba(0,0,0,0.35));
-    }
-
-    .player::after {
-      content: "Akaareno";
-      position: absolute;
-      left: 50%;
-      bottom: 10px;
-      transform: translateX(-50%);
-      color: #111827;
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-    .fall {
-      position: absolute;
-      z-index: 7;
-      top: -60px;
-      width: 46px;
-      height: 46px;
-      display: grid;
-      place-items: center;
-      font-size: 31px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.18);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.28);
-    }
-
-    .good {
-      background: rgba(245, 158, 11, 0.2);
-    }
-
-    .bad {
-      background: rgba(239, 68, 68, 0.22);
-    }
-
-    .screen {
-      position: absolute;
-      z-index: 30;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      background: rgba(2, 6, 23, 0.72);
-      backdrop-filter: blur(8px);
-    }
-
-    .panel {
-      width: min(500px, 94%);
-      padding: 28px;
-      border-radius: 26px;
-      background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(251, 191, 36, 0.34);
-      box-shadow: 0 24px 80px rgba(0,0,0,0.65);
-    }
-
-    .panel h2 {
-      font-size: 32px;
-      margin-bottom: 10px;
-      color: #fbbf24;
-    }
-
-    .panel p {
-      color: #e5e7eb;
-      line-height: 1.6;
-      margin-bottom: 18px;
-      font-size: 16px;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      padding: 14px 24px;
-      border-radius: 999px;
-      font-size: 17px;
-      font-weight: 900;
-      color: #111827;
-      background: linear-gradient(135deg, #fbbf24, #f97316);
-      box-shadow: 0 14px 28px rgba(249, 115, 22, 0.35);
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .tip {
-      margin-top: 14px;
-      color: #cbd5e1;
-      font-size: 14px;
-    }
-
-    @media (max-width: 620px) {
-      .game {
-        height: 560px;
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta
+      content="Akaareno uit De Lier helpt met renovatie, afwerking, kantoorruimtes, woningen, restaurants, barbershops, schilderwerk, vloerverwarming en marmer in Nederland, België en Duitsland."
+      name="description"
+    />
+    <title>
+      Akaareno | Aannemersbedrijf De Lier voor renovatie en afwerking
+    </title>
+    <link href="favicon.ico" rel="icon" sizes="any" />
+    <link href="favicon-32.png" rel="icon" sizes="32x32" type="image/png" />
+    <link href="favicon-192.png" rel="icon" sizes="192x192" type="image/png" />
+    <link href="apple-touch-icon.png" rel="apple-touch-icon" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <script data-seo="akaareno" type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "GeneralContractor",
+        "@id": "https://akaareno.com/#bedrijf",
+        "name": "Akaareno",
+        "url": "https://akaareno.com/",
+        "description": "Aannemersbedrijf uit De Lier voor renovatie, afwerking, woningen, kantoorruimtes en commerciële ruimtes.",
+        "telephone": "+31 6 30 31 47 55",
+        "email": "contact@akaareno.nl",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Persijnstraat 36",
+          "postalCode": "2678 TL",
+          "addressLocality": "De Lier",
+          "addressCountry": "NL"
+        },
+        "areaServed": ["Nederland", "België", "Duitsland"],
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "opens": "08:00",
+            "closes": "20:00"
+          }
+        ],
+        "serviceType": [
+          "Renovatie",
+          "Aannemersbedrijf",
+          "Kantoorruimtes",
+          "Woningrenovatie",
+          "Schilderwerk",
+          "Vloerverwarming",
+          "Loodgieterswerk",
+          "Marmerafwerking",
+          "Restaurant renovatie",
+          "Barbershop renovatie"
+        ]
       }
-
-      .hud {
-        font-size: 12px;
-        flex-wrap: wrap;
-      }
-
-      .player {
-        width: 100px;
-      }
-
-      .wall {
-        width: 260px;
-      }
-
-      .crane {
-        opacity: 0.35;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <main class="page">
-    <div class="logo">🏗️ <span>Akaareno</span> Aannemersbedrijf</div>
-
-    <h1>Excuses, we zijn tijdelijk offline</h1>
-
-    <p class="subtitle">
-      Onze website krijgt een stevige verbouwing. 
-      <strong>Speel even “Bouw de Muur”</strong> terwijl wij alles weer netjes online zetten.
-    </p>
-
-    <section class="game" id="game">
-      <div class="sun"></div>
-
-      <div class="crane">
-        <div class="hook"></div>
-      </div>
-
-      <div class="hud">
-        <div>Stenen: <span id="score">0</span></div>
-        <div>Schade: <span id="damage">0</span>/3</div>
-        <div>Record: <span id="best">0</span></div>
-      </div>
-
-      <div class="wall" id="wall"></div>
-      <div class="player" id="player"></div>
-      <div class="ground"></div>
-
-      <div class="screen" id="startScreen">
-        <div class="panel">
-          <h2>Bouw de Akaareno-muur</h2>
-          <p>
-            Vang de stenen en gereedschappen. Ontwijk waterlekken en breuken.
-            Bij 30 stenen is de muur af.
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Marcellus&amp;family=Montserrat:wght@500;600;700&amp;family=Manrope:wght@500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link href="style.css" rel="stylesheet" />
+    <meta
+      content="Akaareno, aannemersbedrijf De Lier, aannemer De Lier, aannemer Westland, renovatie De Lier, renovatie Westland, kantoorruimte renovatie, kantoor verbouwen, woning renovatie, restaurant verbouwing, barbershop verbouwing, kapsalon verbouwing, schilderwerk, vloerverwarming, loodgieterswerk, marmer afwerking, tuin renovatie, renovatie Nederland, renovatie België, renovatie Duitsland"
+      name="keywords"
+    />
+    <meta content="index, follow" name="robots" />
+    <link href="https://akaareno.com/" rel="canonical" />
+    <meta
+      content="Akaareno | Aannemersbedrijf De Lier voor renovatie en afwerking"
+      property="og:title"
+    />
+    <meta
+      content="Akaareno uit De Lier helpt met renovatie, afwerking, kantoorruimtes, woningen, restaurants, barbershops, schilderwerk, vloerverwarming en marmer in Nederland, België en Duitsland."
+      property="og:description"
+    />
+    <meta content="website" property="og:type" />
+    <meta content="https://akaareno.com/" property="og:url" />
+    <meta content="Akaareno" property="og:site_name" />
+    <meta content="nl_NL" property="og:locale" />
+    <meta content="summary" name="twitter:card" />
+    <meta
+      content="Akaareno | Aannemersbedrijf De Lier voor renovatie en afwerking"
+      name="twitter:title"
+    />
+    <meta
+      content="Akaareno uit De Lier helpt met renovatie, afwerking, kantoorruimtes, woningen, restaurants, barbershops, schilderwerk, vloerverwarming en marmer in Nederland, België en Duitsland."
+      name="twitter:description"
+    />
+  </head>
+  <body id="top">
+    <header class="site-header" id="top">
+      <nav class="navbar container">
+        <div class="nav-start">
+          <a aria-label="Akaareno homepage" class="logo" href="index.html">
+            <div class="logo-mark">
+              <img alt="Akaareno logo" src="Akaareno_Whit_BKG.png" />
+            </div>
+            <span class="logo-text">AKAARENO</span>
+          </a>
+          <div class="language-selector">
+            <button
+              aria-controls="languageMenu"
+              aria-expanded="false"
+              aria-label="Taal kiezen"
+              class="language-toggle"
+              id="languageToggle"
+              type="button"
+            >
+              <img alt="Nederlands" id="languageFlag" src="nlflag.svg" />
+            </button>
+            <div
+              aria-label="Taal kiezen"
+              class="language-menu"
+              id="languageMenu"
+              role="menu"
+            >
+              <button
+                class="language-option"
+                data-lang="nl"
+                role="menuitem"
+                type="button"
+              >
+                <img alt="" src="nlflag.svg" />
+                <span>Nederlands</span>
+              </button>
+              <button
+                class="language-option"
+                data-lang="en"
+                role="menuitem"
+                type="button"
+              >
+                <img alt="" src="uk.svg" />
+                <span>English</span>
+              </button>
+              <button
+                class="language-option"
+                data-lang="fr"
+                role="menuitem"
+                type="button"
+              >
+                <img alt="" src="fransflag.jpg" />
+                <span>Français</span>
+              </button>
+              <button
+                class="language-option"
+                data-lang="de"
+                role="menuitem"
+                type="button"
+              >
+                <img alt="" src="duitsflag.svg" />
+                <span>Deutsch</span>
+              </button>
+              <button
+                class="language-option"
+                data-lang="ar"
+                role="menuitem"
+                type="button"
+              >
+                <img alt="" src="arabische taal.png" />
+                <span>العربية</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button
+          aria-expanded="false"
+          aria-label="Menu openen"
+          class="menu-toggle"
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links">
+          <li>
+            <a class="active" data-i18n="nav.home" href="index.html">Home</a>
+          </li>
+          <li>
+            <a data-i18n="nav.informatie" href="informatie.html">Informatie</a>
+          </li>
+          <li><a data-i18n="nav.diensten" href="diensten.html">Diensten</a></li>
+          <li><a data-i18n="nav.overOns" href="over-ons.html">Over ons</a></li>
+          <li><a data-i18n="nav.contact" href="contact.html">Contact</a></li>
+          <li>
+            <a class="nav-cta" data-i18n="nav.offerte" href="offerte.html"
+              >Offerte</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <section class="hero hero-home">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content reveal">
+          <p class="eyebrow" data-i18n="index.hero.eyebrow">
+            Aannemersbedrijf uit De Lier
           </p>
-          <button id="startBtn">Start bouwen</button>
-          <div class="tip">Gebruik ← → / A D / of sleep met je vinger.</div>
+          <h1 data-i18n="index.hero.title">
+            Renovatie voor woningen, kantoren en zaken die strak moeten kloppen.
+          </h1>
+          <p class="hero-text" data-i18n="index.hero.text">
+            Akaareno werkt aan bestaande ruimtes met aandacht voor afwerking,
+            planning en vakmensen per onderdeel. Van woning tot kantoorruimte,
+            van restaurant tot kapsalon.
+          </p>
+          <div class="hero-cta-buttons">
+            <a
+              class="btn btn-primary"
+              data-i18n="index.hero.cta"
+              href="contact.html"
+              >Plan een kennismaking</a
+            >
+            <a
+              class="btn btn-secondary"
+              data-i18n="index.hero.call"
+              href="tel:+31630314755"
+              >Bel 06 30 31 47 55</a
+            >
+          </div>
+        </div>
+      </section>
+      <section class="trust-strip">
+        <div class="container trust-grid">
+          <div>
+            <strong data-i18n="index.trust.item1.title">15+ jaar</strong
+            ><span data-i18n="index.trust.item1.text"
+              >ervaring in renovatie en afwerking</span
+            >
+          </div>
+          <div>
+            <strong data-i18n="index.trust.item2.title">08:00 - 20:00</strong
+            ><span data-i18n="index.trust.item2.text"
+              >elke dag telefonisch bereikbaar</span
+            >
+          </div>
+          <div>
+            <strong data-i18n="index.trust.item3.title">Binnen 1 dag</strong
+            ><span data-i18n="index.trust.item3.text"
+              >kennismakingsgesprek</span
+            >
+          </div>
+        </div>
+      </section>
+      <section class="section container two-column">
+        <div class="section-copy reveal">
+          <p class="eyebrow" data-i18n="index.section1.eyebrow">
+            Geen standaard klusbedrijf
+          </p>
+          <h2 data-i18n="index.section1.title">
+            Elke ruimte krijgt de juiste vakman op het juiste onderdeel.
+          </h2>
+          <p data-i18n="index.section1.par1">
+            Een goede renovatie valt of staat met specialisatie. Schilderwerk
+            laat u doen door iemand die sterk is in schilderwerk.
+            Vloerverwarming door iemand die dat dagelijks doet. Loodgieterswerk
+            door een vakman die technisch netjes werkt.
+          </p>
+          <p data-i18n="index.section1.par2">
+            Daarom werkt Akaareno met mensen per vakgebied. Dat maakt het
+            verschil bij complete woningen, kantoorruimtes, salons, restaurants,
+            marmerafwerking, tuinen en technische onderdelen.
+          </p>
+          <a
+            class="text-link"
+            data-i18n="index.section1.link"
+            href="diensten.html"
+            >Bekijk wat wij aanpakken</a
+          >
+        </div>
+        <div class="image-card reveal">
+          <img
+            alt="Moderne ruimte met luxe afwerking"
+            src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&amp;fit=crop&amp;w=1200&amp;q=80"
+          />
+          <span class="image-label" data-i18n="index.section1.label"
+            >Woning • Werkruimte • Bedrijfspand</span
+          >
+        </div>
+      </section>
+      <section class="section section-soft">
+        <div class="container">
+          <div class="section-heading reveal">
+            <p class="eyebrow" data-i18n="index.section2.eyebrow">
+              Projecten waar wij scherp op zijn
+            </p>
+            <h2 data-i18n="index.section2.title">
+              Ruimtes die meer moeten uitstralen dan alleen “netjes”.
+            </h2>
+          </div>
+          <div class="cards-grid">
+            <article class="service-card reveal">
+              <span class="card-number">- Akaareno</span>
+              <h3 data-i18n="index.cards.renovation.title">
+                Complete renovatie
+              </h3>
+              <p data-i18n="index.cards.renovation.text">
+                Bestaande woningen en ruimtes opnieuw indelen, opfrissen en
+                strak afwerken.
+              </p>
+            </article>
+            <article class="service-card reveal">
+              <span class="card-number">- Akaareno</span>
+              <h3 data-i18n="index.cards.office.title">Kantoorruimtes</h3>
+              <p data-i18n="index.cards.office.text">
+                Werkplekken, ontvangstruimtes en zakelijke interieurs die
+                professioneel en rustig aanvoelen.
+              </p>
+            </article>
+            <article class="service-card reveal">
+              <span class="card-number">- Akaareno</span>
+              <h3 data-i18n="index.cards.marble.title">Marmer &amp; design</h3>
+              <p data-i18n="index.cards.marble.text">
+                Hoogwaardige uitstraling met rustige kleuren, strakke lijnen en
+                verzorgde materiaalkeuzes.
+              </p>
+            </article>
+            <article class="service-card reveal">
+              <span class="card-number">- Akaareno</span>
+              <h3 data-i18n="index.cards.restaurants.title">
+                Restaurants &amp; salons
+              </h3>
+              <p data-i18n="index.cards.restaurants.text">
+                Commerciële ruimtes waar routing, uitstraling en afwerking samen
+                moeten werken.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section container feature-panel compact-panel reveal">
+        <div>
+          <p class="eyebrow" data-i18n="index.feature.eyebrow">
+            Duidelijke grens
+          </p>
+          <h2 data-i18n="index.feature.title">
+            Wij bouwen niet vanaf een compleet lege ruwbouw.
+          </h2>
+          <p data-i18n="index.feature.text">
+            Akaareno richt zich op bestaande panden, bestaande ruimtes,
+            renovaties en afwerkingen. Projecten waarbij een woning bijvoorbeeld
+            nog geen muren heeft en volledig vanaf nul opgebouwd moet worden,
+            vallen buiten onze focus.
+          </p>
+        </div>
+        <a
+          class="btn btn-primary"
+          data-i18n="index.feature.button"
+          href="offerte.html"
+          >Bespreek uw project</a
+        >
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>
+          <a
+            class="footer-logo"
+            href="index.html"
+            style="
+              color: #ffffff;
+              opacity: 1;
+              text-transform: uppercase;
+              letter-spacing: 0.42em;
+            "
+            >Akaareno</a
+          >
+          <p data-i18n="footer.brandText">
+            Aannemersbedrijf voor renovatie, afwerking en complete projecten in
+            woningen, kantoorruimtes en commerciële interieurs.
+          </p>
+        </div>
+        <div>
+          <h4 data-i18n="footer.pagesHeading">Pagina's</h4>
+          <a data-i18n="nav.home" href="index.html">Home</a>
+          <a data-i18n="nav.informatie" href="informatie.html">Informatie</a>
+          <a data-i18n="nav.diensten" href="diensten.html">Diensten</a>
+          <a data-i18n="nav.overOns" href="over-ons.html">Over ons</a>
+          <a data-i18n="nav.contact" href="contact.html">Contact</a
+          ><a data-i18n="nav.offerte" href="offerte.html">Offerte</a>
+        </div>
+        <div>
+          <h4 data-i18n="footer.servicesHeading">Waar wij werken</h4>
+          <ul>
+            <li data-i18n="footer.service1">Woningen en villa’s</li>
+            <li data-i18n="footer.service2">Kantoorruimtes en werkplekken</li>
+            <li data-i18n="footer.service3">Restaurants en horecazaken</li>
+            <li data-i18n="footer.service4">Barbershops en salons</li>
+            <li data-i18n="footer.service5">Cafés en commerciële ruimtes</li>
+            <li data-i18n="footer.service6">
+              Overige renovatie- en afwerkingsprojecten
+            </li>
+          </ul>
+        </div>
+        <div class="footer-contact-column">
+          <h4 data-i18n="footer.contactHeading">Contact</h4>
+          <div class="footer-contact-details">
+            <div class="footer-contact-group">
+              <a href="tel:+31630314755">+31 6 30 31 47 55</a>
+              <a href="mailto:contact@akaareno.nl">contact@akaareno.nl</a>
+            </div>
+            <div class="footer-contact-group">
+              <span>Persijnstraat 36</span>
+              <span>2678 TL De Lier</span>
+            </div>
+            <div class="footer-contact-group">
+              <span>KVK: 87575795</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div class="screen hidden" id="endScreen">
-        <div class="panel">
-          <h2 id="endTitle">Klus klaar</h2>
-          <p id="endText"></p>
-          <button id="restartBtn">Nog een keer</button>
-        </div>
+      <div class="footer-bottom container">
+        <span data-i18n="footer.copy"
+          >© 2026 Akaareno. Alle rechten voorbehouden.</span
+        >
+        <a class="back-to-top" data-i18n="footer.backToTop" href="#top"
+          >Naar boven</a
+        >
       </div>
-    </section>
-  </main>
-
-  <script>
-    const game = document.getElementById("game");
-    const player = document.getElementById("player");
-    const wall = document.getElementById("wall");
-
-    const scoreEl = document.getElementById("score");
-    const damageEl = document.getElementById("damage");
-    const bestEl = document.getElementById("best");
-
-    const startScreen = document.getElementById("startScreen");
-    const endScreen = document.getElementById("endScreen");
-    const endTitle = document.getElementById("endTitle");
-    const endText = document.getElementById("endText");
-
-    const startBtn = document.getElementById("startBtn");
-    const restartBtn = document.getElementById("restartBtn");
-
-    let score = 0;
-    let damage = 0;
-    let playerX = 0;
-    let keys = {};
-    let items = [];
-    let running = false;
-    let spawnTimer = 0;
-    let lastTime = 0;
-
-    const targetScore = 30;
-    const best = Number(localStorage.getItem("akaareno_build_best") || 0);
-    bestEl.textContent = best;
-
-    function reset() {
-      score = 0;
-      damage = 0;
-      items.forEach(item => item.el.remove());
-      items = [];
-      wall.innerHTML = "";
-      wall.style.height = "0px";
-
-      playerX = game.clientWidth / 2 - player.clientWidth / 2;
-      updatePlayer();
-
-      scoreEl.textContent = score;
-      damageEl.textContent = damage;
-      spawnTimer = 0;
-      lastTime = performance.now();
-    }
-
-    function updatePlayer() {
-      const max = game.clientWidth - player.clientWidth;
-      playerX = Math.max(0, Math.min(max, playerX));
-      player.style.left = playerX + "px";
-      player.style.transform = "none";
-    }
-
-    function addBrickToWall() {
-      const brick = document.createElement("div");
-      brick.className = "brick";
-      wall.appendChild(brick);
-
-      const rows = Math.ceil(score / 6);
-      wall.style.height = Math.min(rows * 27, 150) + "px";
-    }
-
-    function spawnItem() {
-      const random = Math.random();
-
-      let type;
-      let icon;
-      let good;
-
-      if (random < 0.62) {
-        type = "brick";
-        icon = "🧱";
-        good = true;
-      } else if (random < 0.78) {
-        type = "tool";
-        icon = "🔨";
-        good = true;
-      } else if (random < 0.90) {
-        type = "water";
-        icon = "💧";
-        good = false;
-      } else {
-        type = "crack";
-        icon = "💥";
-        good = false;
-      }
-
-      const el = document.createElement("div");
-      el.className = "fall " + (good ? "good" : "bad");
-      el.textContent = icon;
-
-      const x = Math.random() * (game.clientWidth - 55);
-      el.style.left = x + "px";
-
-      game.appendChild(el);
-
-      items.push({
-        el,
-        x,
-        y: -60,
-        good,
-        type,
-        speed: 2.6 + Math.random() * 2.3 + score * 0.045
-      });
-    }
-
-    function hit(a, b) {
-      return !(
-        a.right < b.left ||
-        a.left > b.right ||
-        a.bottom < b.top ||
-        a.top > b.bottom
-      );
-    }
-
-    function finish(win) {
-      running = false;
-
-      const oldBest = Number(localStorage.getItem("akaareno_build_best") || 0);
-      if (score > oldBest) {
-        localStorage.setItem("akaareno_build_best", String(score));
-        bestEl.textContent = score;
-      }
-
-      if (win) {
-        endTitle.textContent = "Muur staat als een huis";
-        endText.innerHTML = "Lekker gewerkt. Je hebt <strong>" + score + "</strong> stenen geplaatst. Akaareno is bijna weer online.";
-      } else {
-        endTitle.textContent = "Oei, schade op de werf";
-        endText.innerHTML = "Je kwam tot <strong>" + score + "</strong> stenen. Probeer opnieuw en hou die lekkages uit de buurt.";
-      }
-
-      endScreen.classList.remove("hidden");
-    }
-
-    function loop(now) {
-      if (!running) return;
-
-      const dt = Math.min(34, now - lastTime);
-      lastTime = now;
-
-      if (keys.ArrowLeft || keys.a || keys.A) {
-        playerX -= 8 * (dt / 16);
-      }
-
-      if (keys.ArrowRight || keys.d || keys.D) {
-        playerX += 8 * (dt / 16);
-      }
-
-      updatePlayer();
-
-      spawnTimer -= dt;
-      if (spawnTimer <= 0) {
-        spawnItem();
-        spawnTimer = Math.max(310, 720 - score * 8);
-      }
-
-      const playerBox = player.getBoundingClientRect();
-
-      for (let i = items.length - 1; i >= 0; i--) {
-        const item = items[i];
-        item.y += item.speed * (dt / 16);
-        item.el.style.top = item.y + "px";
-
-        const itemBox = item.el.getBoundingClientRect();
-
-        if (hit(playerBox, itemBox)) {
-          if (item.good) {
-            score++;
-
-            if (item.type === "tool") {
-              score++;
-            }
-
-            scoreEl.textContent = score;
-            addBrickToWall();
-          } else {
-            damage++;
-            damageEl.textContent = damage;
-            game.animate(
-              [
-                { transform: "translateX(0)" },
-                { transform: "translateX(-8px)" },
-                { transform: "translateX(8px)" },
-                { transform: "translateX(0)" }
-              ],
-              { duration: 180 }
-            );
-          }
-
-          item.el.remove();
-          items.splice(i, 1);
-          continue;
-        }
-
-        if (item.y > game.clientHeight + 70) {
-          if (item.good) {
-            damage++;
-            damageEl.textContent = damage;
-          }
-
-          item.el.remove();
-          items.splice(i, 1);
-        }
-      }
-
-      if (score >= targetScore) {
-        finish(true);
-        return;
-      }
-
-      if (damage >= 3) {
-        finish(false);
-        return;
-      }
-
-      requestAnimationFrame(loop);
-    }
-
-    function start() {
-      reset();
-      startScreen.classList.add("hidden");
-      endScreen.classList.add("hidden");
-      running = true;
-      requestAnimationFrame(loop);
-    }
-
-    window.addEventListener("keydown", function(e) {
-      keys[e.key] = true;
-
-      if (["ArrowLeft", "ArrowRight", " "].includes(e.key)) {
-        e.preventDefault();
-      }
-    });
-
-    window.addEventListener("keyup", function(e) {
-      keys[e.key] = false;
-    });
-
-    game.addEventListener("pointermove", function(e) {
-      if (!running) return;
-
-      const rect = game.getBoundingClientRect();
-      playerX = e.clientX - rect.left - player.clientWidth / 2;
-      updatePlayer();
-    });
-
-    startBtn.addEventListener("click", start);
-    restartBtn.addEventListener("click", start);
-
-    window.addEventListener("resize", updatePlayer);
-    updatePlayer();
-  </script>
-</body>
+    </footer>
+    <script src="main.js"></script>
+  </body>
 </html>
